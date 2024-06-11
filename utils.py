@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import Any
+from dataclasses import dataclass
 
 
 def create_square_name(file_: int, rank: int) -> str:
@@ -82,10 +84,11 @@ RANKS = [Rank_1, Rank_2, Rank_3, Rank_4, Rank_5, Rank_6, Rank_7, Rank_8]
 
 # colors of squares
 SQUARES_COLOR_MAP = {
-    create_square_name(file_, rank): calculate_color(file_, rank).value
+    create_square_name(file_, rank): calculate_color(file_, rank)
     for file_ in FILES
     for rank in RANKS
 }
+
 
 SCREEN_DIMENSION = 640
 SQUARE_SIZE = 80
@@ -121,3 +124,23 @@ GAME_BOARD = "./images/chess_board.png"
 def calculate_image_key(piece_type: PieceType, color: Color) -> str:
     """E.g PAWN, BLACK => BLACK_PAWN"""
     return f"{color.name}_{piece_type.name}"
+
+
+class GameEventType(Enum):
+    MOUSE_CLICK = "MC"
+    QUIT = "Q"
+    KEY_UP = "KU"
+
+
+@dataclass
+class GameEvent:
+    event_type: GameEventType
+    # value from pygame.event.Event.dict property
+    event_data: dict[str, Any]
+
+    def to_file_rank(self) -> tuple[int, int]:
+        (position_x, position_y) = self.event_data["pos"]
+        file = position_x // SQUARE_SIZE + File_A
+        rank = position_y // SQUARE_SIZE + Rank_1
+
+        return (file, rank)
