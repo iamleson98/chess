@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-import square
+from typing import Optional, Any
 
 
 class GameInterface(ABC):
@@ -10,7 +10,7 @@ class GameInterface(ABC):
         pass
 
     @abstractmethod
-    def get_board(self) -> dict[str, square.Square]:
+    def get_board(self) -> dict[str, Optional[Any]]:
         pass
 
     @abstractmethod
