@@ -1,14 +1,14 @@
-# from enum import Enum
-# import sys
 from typing import Tuple, Dict, Callable, Any
 import utils
 import pygame
-import pieces
+from typing import Optional
 
 
 class GameRenderer:
-    def __init__(self, event_listener: Callable[[Any, pygame.event.Event], None]):
-        pygame.init()
+    """Display unit for game"""
+
+    def __init__(self, event_listener: Callable[[Any, utils.GameEvent], None]):
+        pygame.init()  # noqa
         self.__images: Dict[str, pygame.Surface] = {}
         self.__squares: Dict[str, Tuple[int, int]] = {}
         self.__screen = pygame.display.set_mode(
@@ -34,7 +34,7 @@ class GameRenderer:
             self.__screen.blit(
                 board_image, (0, 0)
             )  # draw board image before other pieces
-            pygame.display.flip()
+            # pygame.display.flip()
         except Exception as e:
             print(f"load image {utils.GAME_BOARD} error: {e}")
             self.close()
@@ -67,30 +67,18 @@ class GameRenderer:
                     rank_index * utils.SQUARE_SIZE,
                 )
 
-    def draw_on_square(
-        self, square_name: str, mark_green: bool = False, piece: pieces.Piece = None
-    ):
-        """
-        If `piece` is `None`, then reset color for square
-        """
-        coordination = self.__squares.get(square_name)
-        if not coordination:
-            print(f"draw_on_square. {square_name} is invalid")
-            return
+    def draw_piece_on_square(self, square_name: str, piece_name: str) -> None:
+        """if piece is None, means remove"""
+        if coordination := self.__squares.get(square_name):
+            self.__screen.blit(self.__images[piece_name], coordination)
+        # pygame.display.flip()
 
-        if piece:
-            image_name = utils.calculate_image_key(piece.piece_type, piece.color)
-            image = self.__images[image_name]
-            self.__screen.blit(image, coordination)
-        else:
-            color = (
-                utils.Color.GREEN.value
-                if mark_green
-                else utils.SQUARES_COLOR_MAP.get(square_name)
-            )
+    def set_color_on_square(self, square_name: str, color: utils.Color) -> None:
+        """color is None means reset color"""
+        if coordination := self.__squares[square_name]:
             pygame.draw.rect(
                 self.__screen,
-                color,
+                color.value,
                 (
                     coordination[0],
                     coordination[1],
@@ -98,14 +86,23 @@ class GameRenderer:
                     utils.SQUARE_SIZE,
                 ),
             )
-
-        pygame.display.flip()
+        # pygame.display.flip()
 
     def render(self):
         """render game interface"""
         while True:
             for event in pygame.event.get():
-                self.__event_listener(event)
-            self.__clock.tick(5)
-            # pygame.display.flip()
-            # pygame.event.pump()
+                event_type: Optional[utils.GameEventType] = None
+
+                if event.type == pygame.QUIT:
+                    event_type = utils.GameEventType.QUIT
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    event_type = utils.GameEventType.MOUSE_CLICK
+                elif event.type == pygame.KEYUP:
+                    event_type = utils.GameEventType.KEY_UP
+
+                if event_type:
+                    self.__event_listener(utils.GameEvent(event_type, event.dict))
+
+            self.__clock.tick(3)
+            pygame.display.flip()
