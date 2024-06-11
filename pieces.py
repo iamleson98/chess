@@ -20,7 +20,7 @@ class Piece(ABC):
         """`current_position[0]` is `file`, `current_position[1]` is `rank`"""
 
     def __str__(self) -> str:
-        return f"Piece<{self.piece_type.name}, {self.color.name}>"
+        return f"{self.color.name}_{self.piece_type.name}"
 
 
 @dataclass
@@ -32,7 +32,7 @@ class PiecePawn(Piece):
     def calculate_next_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        moves: set[str] = []
+        moves: set[str] = set()
 
         rank_delta = 1 if self.color == utils.Color.BLACK else -1
 
@@ -80,6 +80,18 @@ class PiecePawn(Piece):
         return current_position[1] == utils.Rank_7
 
 
+KNIGHT_MOVE_DELTAS = [
+    [2, 1],
+    [1, 2],
+    [-1, 2],
+    [-2, 1],
+    [2, -1],
+    [1, -2],
+    [-1, -2],
+    [-2, -1],
+]
+
+
 @dataclass
 class PieceKnight(Piece):
     """knight piece"""
@@ -89,23 +101,12 @@ class PieceKnight(Piece):
     def calculate_next_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        deltas = [
-            [2, 1],
-            [1, 2],
-            [-1, 2],
-            [-2, 1],
-            [2, -1],
-            [1, -2],
-            [-1, -2],
-            [-2, -1],
-        ]
-
         current_position_name = utils.create_square_name(
             current_position[0], current_position[1]
         )
-        moves: set[str] = []
+        moves: set[str] = set()
 
-        for file_delta, rank_delta in deltas:
+        for file_delta, rank_delta in KNIGHT_MOVE_DELTAS:
             dest_position_name = utils.create_square_name(
                 current_position[0] + file_delta, current_position[1] + rank_delta
             )
@@ -121,6 +122,7 @@ class PieceKnight(Piece):
 
 @dataclass
 class PieceBishop(Piece):
+    """piece bishop"""
 
     piece_type: utils.PieceType = utils.PieceType.BISHOP
 
@@ -132,7 +134,7 @@ class PieceBishop(Piece):
         )
 
         total_iterations = 0  # max 4
-        moves: set[str] = []
+        moves: set[str] = set()
         rank_delta = 1
         file_delta = 1
 
@@ -159,12 +161,14 @@ class PieceBishop(Piece):
 
 @dataclass
 class PieceRook(Piece):
+    """piece rook"""
+
     piece_type: utils.PieceType = utils.PieceType.ROOK
 
     def calculate_next_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        moves: set[str] = []
+        moves: set[str] = set()
         rank_delta = 0
         file_delta = 1
         total_iterations = 0  # ar most 4
@@ -197,6 +201,8 @@ class PieceRook(Piece):
 
 @dataclass
 class PieceQueen(Piece):
+    """piece queen"""
+
     piece_type: utils.PieceType = utils.PieceType.QUEEN
 
     def calculate_next_moves(
@@ -208,13 +214,26 @@ class PieceQueen(Piece):
         moves2 = PieceRook(color=self.color).calculate_next_moves(
             current_position, game
         )
-        moves1.add(moves2)
 
-        return moves1
+        return moves1.union(moves2)
+
+
+KING_MOVE_DELTAS = [
+    [1, 1],
+    [-1, -1],
+    [1, 0],
+    [0, 1],
+    [-1, 0],
+    [0, -1],
+    [-1, 1],
+    [1, -1],
+]
 
 
 @dataclass
 class PieceKing(Piece):
+    """piece king"""
+
     piece_type: utils.PieceType = utils.PieceType.KING
 
     def calculate_next_moves(
@@ -224,20 +243,9 @@ class PieceKing(Piece):
             current_position[0], current_position[1]
         )
 
-        moves: set[str] = []
+        moves: set[str] = set()
 
-        deltas = [
-            [1, 1],
-            [-1, -1],
-            [1, 0],
-            [0, 1],
-            [-1, 0],
-            [0, -1],
-            [-1, 1],
-            [1, -1],
-        ]
-
-        for file_delta, rank_delta in deltas:
+        for file_delta, rank_delta in KING_MOVE_DELTAS:
             dest_position_name = utils.create_square_name(
                 current_position[0] + file_delta, current_position[1] + rank_delta
             )
