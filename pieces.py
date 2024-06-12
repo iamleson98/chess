@@ -59,9 +59,7 @@ class PiecePawn(Piece):
             else [[-1, -1], [-1, 1]]
         )
 
-        current_position_name = utils.create_square_name(
-            current_position[0], current_position[1]
-        )
+        current_position_name = utils.create_square_name(*current_position)
         for file_delta, rank_delta in capture_detals:
             capture_position_name = utils.create_square_name(
                 current_position[0] + file_delta, current_position[1] + rank_delta
@@ -101,9 +99,7 @@ class PieceKnight(Piece):
     def calculate_next_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        current_position_name = utils.create_square_name(
-            current_position[0], current_position[1]
-        )
+        current_position_name = utils.create_square_name(*current_position)
         moves: set[str] = set()
 
         for file_delta, rank_delta in KNIGHT_MOVE_DELTAS:
@@ -129,9 +125,7 @@ class PieceBishop(Piece):
     def calculate_next_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        current_position_name = utils.create_square_name(
-            current_position[0], current_position[1]
-        )
+        current_position_name = utils.create_square_name(*current_position)
 
         total_iterations = 0  # max 4
         moves: set[str] = set()
@@ -172,9 +166,7 @@ class PieceRook(Piece):
         rank_delta = 0
         file_delta = 1
         total_iterations = 0  # ar most 4
-        current_position_name = utils.create_square_name(
-            current_position[0], current_position[1]
-        )
+        current_position_name = utils.create_square_name(*current_position)
 
         while total_iterations < 4:
             dest_position_name = utils.create_square_name(
@@ -239,9 +231,7 @@ class PieceKing(Piece):
     def calculate_next_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        current_position_name = utils.create_square_name(
-            current_position[0], current_position[1]
-        )
+        current_position_name = utils.create_square_name(*current_position)
 
         moves: set[str] = set()
 
