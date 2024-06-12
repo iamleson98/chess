@@ -26,13 +26,10 @@ class Game(GameInterface):
     def __init__(self):
         self.__board: dict[str, Optional[pieces.Piece]] = {}
         self.__screen = None
-
         self.last_file = utils.File_A
         self.last_rank = utils.Rank_1
         self.__available_moves: set[str] = set()
-
-        # indicate which side can move
-        self.__turn = utils.Color.BLACK
+        self.__turn_color = utils.Color.BLACK
         self.__active_square: Optional[str] = None
         self.__captures_data = {
             utils.Color.BLACK: [],
@@ -45,8 +42,8 @@ class Game(GameInterface):
 
     def switch_turn(self) -> None:
         """Toggle turns for players"""
-        self.__turn = (
-            utils.Color.BLACK if self.__turn == utils.Color.WHITE else utils.Color.WHITE
+        self.__turn_color = (
+            utils.Color.BLACK if self.__turn_color == utils.Color.WHITE else utils.Color.WHITE
         )
 
     def __init_board(self) -> None:
@@ -102,22 +99,14 @@ class Game(GameInterface):
         self.__init_board()
         self.re_organize_board()
 
-    def check_2_cells_hold_enemies(
+    def check_2_squares_hold_enemies(
         self, square_name_1: str, square_name_2: str
     ) -> bool:
         """Checks if 2 cells are within board and hold 2 pieces with different color"""
-        if square_name_1 not in self.__board or square_name_2 not in self.__board:
-            return False
+        piece_1 = self.__board.get(square_name_1)
+        piece_2 = self.__board.get(square_name_2)
 
-        piece_1 = self.__board[square_name_1]
-        if not piece_1:
-            return False
-
-        piece_2 = self.__board[square_name_2]
-        if not piece_2:
-            return False
-
-        return piece_2.color != piece_1.color
+        return piece_1 and piece_2 and piece_2.color != piece_1.color
 
     def check_square_occupied(self, square_name: str) -> bool:
         """
@@ -130,6 +119,7 @@ class Game(GameInterface):
     def move_piece_from_source_to_dest(self, source_sq: str, dest_sq: str) -> None:
         if source_sq not in self.__board or dest_sq not in self.__board:
             return
+
         self.__screen.draw_piece_on_square(dest_sq, self.__board[source_sq].__str__())
         original_color = utils.SQUARES_COLOR_MAP[source_sq]
         self.__screen.set_color_on_square(source_sq, original_color)
@@ -152,7 +142,6 @@ class Game(GameInterface):
                 self.move_piece_from_source_to_dest(
                     self.__active_square, selected_square_name
                 )
-                self.__board
                 self.__active_square = None
                 self.__available_moves = set()
                 self.switch_turn()
@@ -164,7 +153,7 @@ class Game(GameInterface):
                 self.__active_square = None
                 self.__available_moves = set()
 
-        elif self.check_selected_cell_is_valid_turn(selected_square_name):
+        elif self.check_selected_square_holds_piece_in_turn(selected_square_name):
             # means user is choosing piece to move
             piece = self.__board[selected_square_name]
             self.__available_moves = piece.calculate_next_moves(file_rank, self)
@@ -180,10 +169,10 @@ class Game(GameInterface):
         elif event.event_type == utils.GameEventType.MOUSE_CLICK:
             self.handle_cell_select(event)
 
-    def check_selected_cell_is_valid_turn(self, square_name: str) -> bool:
+    def check_selected_square_holds_piece_in_turn(self, square_name: str) -> bool:
         """check if selected cell contains a piece with color match turn color"""
         piece = self.__board.get(square_name)
-        return piece and piece.color == self.__turn
+        return piece and piece.color == self.__turn_color
 
     def run(self):
         """run the game"""
@@ -196,10 +185,3 @@ class Game(GameInterface):
         self.__board.clear()
         self.__screen.close()
         sys.exit()
-
-
-if __name__ == "__main__":
-    game = Game()
-    game_ui = board.GameRenderer(game.event_handler)
-    game.set_screen(game_ui)
-    game.run()

@@ -8,7 +8,7 @@
             "name": "Chess",
             "type": "debugpy",
             "request": "launch",
-            "program": "game.py",
+            "program": "__init__.py",
             "cwd": ""
         },
     ],

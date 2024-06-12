@@ -14,7 +14,7 @@ class GameInterface(ABC):
         pass
 
     @abstractmethod
-    def check_2_cells_hold_enemies(
+    def check_2_squares_hold_enemies(
         self, square_name_1: str, square_name_2: str
     ) -> bool:
         pass

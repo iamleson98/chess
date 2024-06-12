@@ -56,7 +56,7 @@ class PiecePawn(Piece):
         capture_detals = (
             [[-1, 1], [1, 1]]
             if self.color == utils.Color.BLACK
-            else [[-1, -1], [-1, 1]]
+            else [[-1, -1], [1, -1]]
         )
 
         current_position_name = utils.create_square_name(*current_position)
@@ -64,7 +64,7 @@ class PiecePawn(Piece):
             capture_position_name = utils.create_square_name(
                 current_position[0] + file_delta, current_position[1] + rank_delta
             )
-            if game.check_2_cells_hold_enemies(
+            if game.check_2_squares_hold_enemies(
                 current_position_name, capture_position_name
             ):
                 moves.add(capture_position_name)
@@ -108,7 +108,7 @@ class PieceKnight(Piece):
             )
             if not game.check_square_occupied(
                 dest_position_name
-            ) or game.check_2_cells_hold_enemies(
+            ) or game.check_2_squares_hold_enemies(
                 dest_position_name, current_position_name
             ):
                 moves.add(dest_position_name)
@@ -131,18 +131,22 @@ class PieceBishop(Piece):
         moves: set[str] = set()
         rank_delta = 1
         file_delta = 1
+        move_delta = 0
 
         while total_iterations < 4:
+            move_delta += 1
             dest_position_name = utils.create_square_name(
-                current_position[0] + file_delta, current_position[1] + rank_delta
+                current_position[0] + file_delta * move_delta,
+                current_position[1] + rank_delta * move_delta,
             )
             if not game.check_square_occupied(
                 dest_position_name
-            ) or game.check_2_cells_hold_enemies(
+            ) or game.check_2_squares_hold_enemies(
                 dest_position_name, current_position_name
             ):
                 moves.add(dest_position_name)
             else:
+                move_delta = 0
                 total_iterations += 1
                 rank_delta = -rank_delta
                 file_delta = -file_delta
@@ -165,20 +169,24 @@ class PieceRook(Piece):
         moves: set[str] = set()
         rank_delta = 0
         file_delta = 1
-        total_iterations = 0  # ar most 4
+        total_iterations = 0  # at most 4
         current_position_name = utils.create_square_name(*current_position)
+        move_delta = 0
 
         while total_iterations < 4:
+            move_delta += 1
             dest_position_name = utils.create_square_name(
-                current_position[0] + file_delta, current_position[1] + rank_delta
+                current_position[0] + file_delta * move_delta,
+                current_position[1] + rank_delta * move_delta,
             )
             if not game.check_square_occupied(
                 dest_position_name
-            ) or game.check_2_cells_hold_enemies(
+            ) or game.check_2_squares_hold_enemies(
                 dest_position_name, current_position_name
             ):
                 moves.add(dest_position_name)
             else:
+                move_delta = 0
                 if file_delta == 1:
                     file_delta = -1
                 elif file_delta == -1:
@@ -241,7 +249,7 @@ class PieceKing(Piece):
             )
             if not game.check_square_occupied(
                 dest_position_name
-            ) or game.check_2_cells_hold_enemies(
+            ) or game.check_2_squares_hold_enemies(
                 dest_position_name, current_position_name
             ):
                 moves.add(dest_position_name)

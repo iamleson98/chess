@@ -34,7 +34,7 @@ class GameRenderer:
             self.__screen.blit(
                 board_image, (0, 0)
             )  # draw board image before other pieces
-            # pygame.display.flip()
+            pygame.display.flip()
         except Exception as e:
             print(f"load image {utils.GAME_BOARD} error: {e}")
             self.close()
@@ -69,24 +69,24 @@ class GameRenderer:
 
     def draw_piece_on_square(self, square_name: str, piece_name: str) -> None:
         """if piece is None, means remove"""
-        if coordination := self.__squares.get(square_name):
-            self.__screen.blit(self.__images[piece_name], coordination)
-        # pygame.display.flip()
+        coordination = self.__squares[square_name]
+        self.__screen.blit(self.__images[piece_name], coordination)
+        pygame.display.flip()
 
     def set_color_on_square(self, square_name: str, color: utils.Color) -> None:
         """color is None means reset color"""
-        if coordination := self.__squares[square_name]:
-            pygame.draw.rect(
-                self.__screen,
-                color.value,
-                (
-                    coordination[0],
-                    coordination[1],
-                    utils.SQUARE_SIZE,
-                    utils.SQUARE_SIZE,
-                ),
-            )
-        # pygame.display.flip()
+        coordination = self.__squares[square_name]
+        pygame.draw.rect(
+            self.__screen,
+            color.value,
+            (
+                coordination[0],
+                coordination[1],
+                utils.SQUARE_SIZE,
+                utils.SQUARE_SIZE,
+            ),
+        )
+        pygame.display.flip()
 
     def render(self):
         """render game interface"""
@@ -105,4 +105,4 @@ class GameRenderer:
                     self.__event_listener(utils.GameEvent(event_type, event.dict))
 
             self.__clock.tick(3)
-            pygame.display.flip()
+            # pygame.display.flip()
