@@ -3,12 +3,12 @@ from typing import Any
 from dataclasses import dataclass
 
 
-def create_square_name(file_: int, rank: int) -> str:
+def create_square_name(file: int, rank: int) -> str:
     """
     E.g
-    `file_` = 'A', `rank' = 1, => "A1"
+    `file` = 'A', `rank' = 1, => "A1"
     """
-    return f"{chr(file_)}{rank}"
+    return f"{chr(file)}{rank}"
 
 
 class Color(Enum):
@@ -19,13 +19,11 @@ class Color(Enum):
     GREEN = "#19992A"
 
 
-def calculate_color(file_: int, rank: int) -> Color:
+def calculate_square_color(file: int, rank: int) -> Color:
     """
     Returns `Color.BLACK` for black, `Color.WHITE` for white
     """
-    if (file_ + rank) & 1 == 0:
-        return Color.WHITE
-    return Color.BLACK
+    return Color.BLACK if (file + rank) & 1 else Color.WHITE
 
 
 class PieceType(Enum):
@@ -52,9 +50,9 @@ File_G = ord("G")
 File_H = ord("H")
 
 
-def is_file_within_board(file_: int) -> bool:
+def is_file_within_board(file: int) -> bool:
     """check if given file is within board"""
-    return MIN_FILE <= file_ <= MAX_FILE
+    return MIN_FILE <= file <= MAX_FILE
 
 
 FILES = [File_A, File_B, File_C, File_D, File_E, File_F, File_G, File_H]
@@ -84,8 +82,8 @@ RANKS = [Rank_1, Rank_2, Rank_3, Rank_4, Rank_5, Rank_6, Rank_7, Rank_8]
 
 # colors of squares
 SQUARES_COLOR_MAP = {
-    create_square_name(file_, rank): calculate_color(file_, rank)
-    for file_ in FILES
+    create_square_name(file, rank): calculate_square_color(file, rank)
+    for file in FILES
     for rank in RANKS
 }
 
