@@ -59,8 +59,8 @@ class GameRenderer:
 
     def __classify_board(self):
         for rank_index, rank in enumerate(utils.RANKS):
-            for file_index, file_ in enumerate(utils.FILES):
-                square_name = utils.create_square_name(file_, rank)
+            for file_index, file in enumerate(utils.FILES):
+                square_name = utils.create_square_name(file, rank)
 
                 self.__squares[square_name] = (
                     file_index * utils.SQUARE_SIZE,
@@ -69,24 +69,27 @@ class GameRenderer:
 
     def draw_piece_on_square(self, square_name: str, piece_name: str) -> None:
         """if piece is None, means remove"""
-        coordination = self.__squares[square_name]
-        self.__screen.blit(self.__images[piece_name], coordination)
-        pygame.display.flip()
+        if coordination := self.__squares.get(square_name):
+            self.__screen.blit(self.__images[piece_name], coordination)
+            pygame.display.flip()
 
     def set_color_on_square(self, square_name: str, color: utils.Color) -> None:
-        """color is None means reset color"""
-        coordination = self.__squares[square_name]
-        pygame.draw.rect(
-            self.__screen,
-            color.value,
-            (
-                coordination[0],
-                coordination[1],
-                utils.SQUARE_SIZE,
-                utils.SQUARE_SIZE,
-            ),
-        )
-        pygame.display.flip()
+        """
+        if `occupied_piece_name` is None => paint given color on the square.
+        Otherwise, paint background color, then put piece upon.
+        """
+        if coordination := self.__squares[square_name]:
+            pygame.draw.rect(
+                self.__screen,
+                color.value,
+                (
+                    coordination[0],
+                    coordination[1],
+                    utils.SQUARE_SIZE,
+                    utils.SQUARE_SIZE,
+                ),
+            )
+            pygame.display.flip()
 
     def render(self):
         """render game interface"""
@@ -105,4 +108,3 @@ class GameRenderer:
                     self.__event_listener(utils.GameEvent(event_type, event.dict))
 
             self.__clock.tick(3)
-            # pygame.display.flip()
