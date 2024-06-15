@@ -14,7 +14,7 @@ class Piece(ABC):
     id: str = str(uuid.uuid4())
 
     @abstractmethod
-    def calculate_next_moves(
+    def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
         """`current_position[0]` is `file`, `current_position[1]` is `rank`"""
@@ -29,7 +29,7 @@ class PiecePawn(Piece):
 
     piece_type: utils.PieceType = utils.PieceType.PAWN
 
-    def calculate_next_moves(
+    def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
         moves: set[str] = set()
@@ -96,7 +96,7 @@ class PieceKnight(Piece):
 
     piece_type: utils.PieceType = utils.PieceType.KNIGHT
 
-    def calculate_next_moves(
+    def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
         current_position_name = utils.create_square_name(*current_position)
@@ -122,7 +122,7 @@ class PieceBishop(Piece):
 
     piece_type: utils.PieceType = utils.PieceType.BISHOP
 
-    def calculate_next_moves(
+    def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
         current_position_name = utils.create_square_name(*current_position)
@@ -131,22 +131,25 @@ class PieceBishop(Piece):
         moves: set[str] = set()
         rank_delta = 1
         file_delta = 1
-        move_delta = 0
+        delta_counter = 0
 
         while total_iterations < 4:
-            move_delta += 1
+            delta_counter += 1
             dest_position_name = utils.create_square_name(
-                current_position[0] + file_delta * move_delta,
-                current_position[1] + rank_delta * move_delta,
+                current_position[0] + file_delta * delta_counter,
+                current_position[1] + rank_delta * delta_counter,
             )
-            if not game.check_square_occupied(
-                dest_position_name
-            ) or game.check_2_squares_hold_enemies(
+
+            square_occupied = game.check_square_occupied(dest_position_name)
+            two_squares_hold_enemies = game.check_2_squares_hold_enemies(
                 dest_position_name, current_position_name
-            ):
+            )
+
+            if not square_occupied or two_squares_hold_enemies:
                 moves.add(dest_position_name)
-            else:
-                move_delta = 0
+
+            if square_occupied:
+                delta_counter = 0
                 total_iterations += 1
                 rank_delta = -rank_delta
                 file_delta = -file_delta
@@ -163,7 +166,7 @@ class PieceRook(Piece):
 
     piece_type: utils.PieceType = utils.PieceType.ROOK
 
-    def calculate_next_moves(
+    def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
         moves: set[str] = set()
@@ -171,22 +174,26 @@ class PieceRook(Piece):
         file_delta = 1
         total_iterations = 0  # at most 4
         current_position_name = utils.create_square_name(*current_position)
-        move_delta = 0
+        deltal_counter = 0
 
         while total_iterations < 4:
-            move_delta += 1
+            deltal_counter += 1
+
             dest_position_name = utils.create_square_name(
-                current_position[0] + file_delta * move_delta,
-                current_position[1] + rank_delta * move_delta,
+                current_position[0] + deltal_counter * file_delta,
+                current_position[1] + deltal_counter * rank_delta,
             )
-            if not game.check_square_occupied(
-                dest_position_name
-            ) or game.check_2_squares_hold_enemies(
+
+            square_occupied = game.check_square_occupied(dest_position_name)
+            two_squares_hold_enemies = game.check_2_squares_hold_enemies(
                 dest_position_name, current_position_name
-            ):
+            )
+
+            if not square_occupied or two_squares_hold_enemies:
                 moves.add(dest_position_name)
-            else:
-                move_delta = 0
+
+            if square_occupied:
+                deltal_counter = 0
                 if file_delta == 1:
                     file_delta = -1
                 elif file_delta == -1:
@@ -205,13 +212,13 @@ class PieceQueen(Piece):
 
     piece_type: utils.PieceType = utils.PieceType.QUEEN
 
-    def calculate_next_moves(
+    def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        moves1 = PieceBishop(color=self.color).calculate_next_moves(
+        moves1 = PieceBishop(color=self.color).calculate_available_moves(
             current_position, game
         )
-        moves2 = PieceRook(color=self.color).calculate_next_moves(
+        moves2 = PieceRook(color=self.color).calculate_available_moves(
             current_position, game
         )
 
@@ -236,7 +243,7 @@ class PieceKing(Piece):
 
     piece_type: utils.PieceType = utils.PieceType.KING
 
-    def calculate_next_moves(
+    def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
         current_position_name = utils.create_square_name(*current_position)
