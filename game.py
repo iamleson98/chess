@@ -5,20 +5,6 @@ import board
 from game_types import GameInterface
 from typing import Optional, Any
 
-SAMPLE = """
-		Black
-  A B C D E F G H -- Files
-1 W B W B W B W B
-2 B W B W B W B W
-3 W B W B W B W B
-4 B W B W B W B W
-5 W B W B W B W B
-6 B W B W B W B W
-7 W B W B W B W B
-8 B W B W B W B W
-		White
-"""
-
 
 class Game(GameInterface):
     """Game holds logic of chess game"""
@@ -133,10 +119,8 @@ class Game(GameInterface):
                 self.__winner = self.__turn
                 self.__close()
 
-        source_sq_original_color = utils.SQUARES_COLOR_MAP[source_sq]
-        dest_sq_original_color = utils.SQUARES_COLOR_MAP[dest_sq]
-        self.__screen.set_color_on_square(source_sq, source_sq_original_color)
-        self.__screen.set_color_on_square(dest_sq, dest_sq_original_color)
+        self.__screen.set_color_on_square(source_sq, utils.SQUARES_COLOR_MAP[source_sq])
+        self.__screen.set_color_on_square(dest_sq, utils.SQUARES_COLOR_MAP[dest_sq])
         self.__screen.draw_piece_on_square(dest_sq, source_piece.__str__())
 
         self.__board[dest_sq] = source_piece
@@ -211,5 +195,6 @@ class Game(GameInterface):
 
     def __close(self):
         self.__board.clear()
+        self.__captures_data.clear()
         self.__screen.close()
         sys.exit()
