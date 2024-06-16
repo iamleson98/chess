@@ -215,12 +215,8 @@ class PieceQueen(Piece):
     def calculate_available_moves(
         self, current_position: tuple[int, int], game: GameInterface
     ) -> set[str]:
-        moves1 = PieceBishop(color=self.color).calculate_available_moves(
-            current_position, game
-        )
-        moves2 = PieceRook(color=self.color).calculate_available_moves(
-            current_position, game
-        )
+        moves1 = PieceBishop.calculate_available_moves(self, current_position, game)
+        moves2 = PieceRook.calculate_available_moves(self, current_position, game)
 
         return moves1.union(moves2)
 
