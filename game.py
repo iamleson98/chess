@@ -19,7 +19,7 @@ class Game(GameInterface):
 
         # indicate which side can move
         self.__turn = utils.Color.BLACK
-        self.__winner: utils.Color = None
+        self.__winner: Optional[utils.Color] = None
         self.__active_square: Optional[str] = None
         self.__captures_data: dict[utils.Color, list[pieces.Piece]] = {
             utils.Color.BLACK: [],
@@ -96,7 +96,7 @@ class Game(GameInterface):
         piece_1 = self.__board.get(square_name_1)
         piece_2 = self.__board.get(square_name_2)
 
-        return piece_1 and piece_2 and piece_1.color != piece_2.color
+        return piece_1 is not None and piece_2 is not None and piece_1.color != piece_2.color
 
     def check_square_occupied(self, square_name: str) -> bool:
         """
@@ -162,7 +162,7 @@ class Game(GameInterface):
 
         elif self.check_selected_square_is_valid_turn(selected_square_name):
             # means user is choosing piece to move
-            piece = self.__board[selected_square_name]
+            piece: pieces.Piece = self.__board[selected_square_name]
             self.__available_moves = piece.calculate_available_moves(file_rank, self)
             self.__active_square = selected_square_name
 

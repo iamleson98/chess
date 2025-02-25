@@ -1,4 +1,4 @@
-from typing import Tuple, Dict, Callable, Any
+from typing import Tuple, Dict, Callable
 import utils
 import pygame
 from typing import Optional
@@ -7,7 +7,7 @@ from typing import Optional
 class GameRenderer:
     """Display unit for game"""
 
-    def __init__(self, event_listener: Callable[[Any, utils.GameEvent], None]):
+    def __init__(self, event_listener: Callable[[utils.GameEvent], None]):
         pygame.init()  # noqa
         self.__images: Dict[str, pygame.Surface] = {}
         self.__squares: Dict[str, Tuple[int, int]] = {}
